@@ -6,7 +6,8 @@ function CanvasRenderer(animationItem, config){
         progressiveLoad: (config && config.progressiveLoad) || false,
         preserveAspectRatio: (config && config.preserveAspectRatio) || 'xMidYMid meet',
         imagePreserveAspectRatio: (config && config.imagePreserveAspectRatio) || 'xMidYMid slice',
-        className: (config && config.className) || ''
+        className: (config && config.className) || '',
+        id: (config && config.id) || '',
     };
     this.renderConfig.dpr = (config && config.dpr) || 1;
     if (this.animationItem.wrapper) {
@@ -148,6 +149,9 @@ CanvasRenderer.prototype.configAnimation = function(animData){
         if(this.renderConfig.className) {
             this.animationItem.container.setAttribute('class', this.renderConfig.className);
         }
+        if(this.renderConfig.id) {
+            this.animationItem.container.setAttribute('id', this.renderConfig.id);
+        }
     }else{
         this.canvasContext = this.renderConfig.context;
     }
@@ -245,7 +249,7 @@ CanvasRenderer.prototype.updateContainerSize = function () {
 
 CanvasRenderer.prototype.destroy = function () {
     if(this.renderConfig.clearCanvas) {
-        this.animationItem.wrapper.innerHTML = '';
+        this.animationItem.wrapper.innerText = '';
     }
     var i, len = this.layers ? this.layers.length : 0;
     for (i = len - 1; i >= 0; i-=1) {
