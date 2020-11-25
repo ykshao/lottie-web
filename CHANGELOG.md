@@ -1,3 +1,20 @@
+## V 5.7.4
+- FIX: `addEventListener` method returns function except `void`
+- EXPRESSIONS:  added support for toWorldVec, fromWorldVec and getValueAtTime for transforms
+- EXPRESSIONS: fixed propertyGroup expression
+- FIX: added svg effects placeholder
+- FIX: added check for wrapper on destroy canvas
+- EXPORTER: missing layer styles
+- EXPORTER: export only work area
+
+## V 5.7.3
+- EXPRESSIONS: Added more expressions support
+
+## V 5.7.2
+- FIX: Trusted Types compliance by removing calls to .innerHTML
+- FIX: make callback parameter of removeEventListener optional
+- FEATURE: Audio Support
+
 ## V 5.7.1
 - REPORT: Improved animation report
 - FIX: Expressions separate dimensions

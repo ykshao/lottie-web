@@ -24,6 +24,7 @@ var ExpressionPropertyInterface = (function() {
                 }
                 var valueProp = type === 'unidimensional' ? new Number(value) : Object.assign({}, value);
                 valueProp.time = property.keyframes[pos-1].t / property.elem.comp.globalData.frameRate;
+                valueProp.value = type === 'unidimensional' ? value[0] : value;
                 return valueProp;
             }
         };
@@ -62,7 +63,7 @@ var ExpressionPropertyInterface = (function() {
             property = defaultMultidimensionalValue;
         }
         var mult = 1 / property.mult;
-        var len = property.pv.length;
+        var len = (property.data && property.data.l) || property.pv.length;
         var expressionValue = createTypedArray('float32', len);
         var arrValue = createTypedArray('float32', len);
         expressionValue.value = arrValue;

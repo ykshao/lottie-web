@@ -1,46 +1,59 @@
 var LayerExpressionInterface = (function (){
+
+    function getMatrix(time) {
+        var toWorldMat = new Matrix();
+        if (time !== undefined) {
+            var propMatrix = this._elem.finalTransform.mProp.getValueAtTime(time);
+            propMatrix.clone(toWorldMat);
+        } else {
+            var transformMat = this._elem.finalTransform.mProp;
+            transformMat.applyToMatrix(toWorldMat);
+        }
+        return toWorldMat;
+    }
+
+    function toWorldVec(arr, time){
+        var toWorldMat = this.getMatrix(time);
+        toWorldMat.props[12] = toWorldMat.props[13] = toWorldMat.props[14] = 0;
+        return this.applyPoint(toWorldMat, arr);
+    }
+
     function toWorld(arr, time){
-        var toWorldMat = new Matrix();
-        toWorldMat.reset();
-        var transformMat;
-        if(time) {
-            //Todo implement value at time on transform properties
-            //transformMat = this._elem.finalTransform.mProp.getValueAtTime(time);
-            transformMat = this._elem.finalTransform.mProp;
-        } else {
-            transformMat = this._elem.finalTransform.mProp;
-        }
-        transformMat.applyToMatrix(toWorldMat);
-        if(this._elem.hierarchy && this._elem.hierarchy.length){
-            var i, len = this._elem.hierarchy.length;
-            for(i=0;i<len;i+=1){
-                this._elem.hierarchy[i].finalTransform.mProp.applyToMatrix(toWorldMat);
-            }
-            return toWorldMat.applyToPointArray(arr[0],arr[1],arr[2]||0);
-        }
-        return toWorldMat.applyToPointArray(arr[0],arr[1],arr[2]||0);
+        var toWorldMat = this.getMatrix(time);
+        return this.applyPoint(toWorldMat, arr);
     }
+
+    function fromWorldVec(arr, time){
+        var toWorldMat = this.getMatrix(time);
+        toWorldMat.props[12] = toWorldMat.props[13] = toWorldMat.props[14] = 0;
+        return this.invertPoint(toWorldMat, arr);
+    }
+
     function fromWorld(arr, time){
-        var toWorldMat = new Matrix();
-        toWorldMat.reset();
-        var transformMat;
-        if(time) {
-            //Todo implement value at time on transform properties
-            //transformMat = this._elem.finalTransform.mProp.getValueAtTime(time);
-            transformMat = this._elem.finalTransform.mProp;
-        } else {
-            transformMat = this._elem.finalTransform.mProp;
-        }
-        transformMat.applyToMatrix(toWorldMat);
+        var toWorldMat = this.getMatrix(time);
+        return this.invertPoint(toWorldMat, arr);
+    }
+
+    function applyPoint(matrix, arr) {
         if(this._elem.hierarchy && this._elem.hierarchy.length){
             var i, len = this._elem.hierarchy.length;
             for(i=0;i<len;i+=1){
-                this._elem.hierarchy[i].finalTransform.mProp.applyToMatrix(toWorldMat);
+                this._elem.hierarchy[i].finalTransform.mProp.applyToMatrix(matrix);
             }
-            return toWorldMat.inversePoint(arr);
         }
-        return toWorldMat.inversePoint(arr);
+        return matrix.applyToPointArray(arr[0],arr[1],arr[2]||0);
     }
+
+    function invertPoint(matrix, arr) {
+        if (this._elem.hierarchy && this._elem.hierarchy.length){
+            var i, len = this._elem.hierarchy.length;
+            for(i=0;i<len;i+=1){
+                this._elem.hierarchy[i].finalTransform.mProp.applyToMatrix(matrix);
+            }
+        }
+        return matrix.inversePoint(arr);
+    }
+
     function fromComp(arr){
         var toWorldMat = new Matrix();
         toWorldMat.reset();
@@ -88,10 +101,17 @@ var LayerExpressionInterface = (function (){
                 case "effects":
                 case "Effects":
                     return _thisLayerFunction.effect;
+                case "ADBE Text Properties":
+                    return _thisLayerFunction.textInterface;
             }
         }
+        _thisLayerFunction.getMatrix = getMatrix;
+        _thisLayerFunction.invertPoint = invertPoint;
+        _thisLayerFunction.applyPoint = applyPoint;
         _thisLayerFunction.toWorld = toWorld;
+        _thisLayerFunction.toWorldVec = toWorldVec;
         _thisLayerFunction.fromWorld = fromWorld;
+        _thisLayerFunction.fromWorldVec = fromWorldVec;
         _thisLayerFunction.toComp = toWorld;
         _thisLayerFunction.fromComp = fromComp;
         _thisLayerFunction.sampleImage = sampleImage;
